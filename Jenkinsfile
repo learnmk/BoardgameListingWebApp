@@ -30,7 +30,12 @@ pipeline {
               withSonarQubeEnv('sonar') {
             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=BoardgameList \
             -Dsonar.projectKey=BoardgameList -Dsonar.java.binaries=. '''
-}
+              }
+            }
+        }
+         stage('Quality gate') {
+            steps {
+              waitForQualityGate abortPipeline: false
             }
         }
     }
