@@ -2,38 +2,35 @@ pipeline {
     agent any
     
     tools {
-        jdk 'jdk11'
+        jdk 'jdk17'
         maven 'maven3'
     }
 
+    environment {
+        SCANNER_HOME= tool 'sonar-scanner'
+    }
     stages {
         stage('Git Checkout') {
             steps {
-                git 'https://github.com/jaiswaladi2468/BoardgameListingWebApp.git'
+              git 'https://github.com/learnmk/BoardgameListingWebApp.git'
             }
         }
-        
-        stage('Compile') {
+        stage('maven compile') {
             steps {
-               sh "mvn compile"
+              sh 'mvn compile'
             }
         }
-        
-        stage('Test') {
+        stage('maven test') {
             steps {
-                sh "mvn test"
+              sh 'mvn test'
             }
         }
-        
-        stage('Package') {
+        stage('sonar scanner') {
             steps {
-                sh "mvn package"
-            }
-        }
-        
-        stage('Install') {
-            steps {
-                sh "mvn install"
+              withSonarQubeEnv('sonar') {
+            sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=BoardgameList \
+            -Dsonar.projectKey=BoardgameList -Dsonar.java.binaries=. '''
+}
             }
         }
     }
